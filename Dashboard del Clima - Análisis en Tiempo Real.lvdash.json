@@ -284,7 +284,7 @@
           "position": {
             "x": 0,
             "y": 0,
-            "width": 12,
+            "width": 7,
             "height": 1
           }
         },
@@ -348,11 +348,11 @@
                   "datasetName": "a8096cb3",
                   "fields": [
                     {
-                      "name": "rain",
-                      "expression": "`rain`"
+                      "name": "avg(precipitation)",
+                      "expression": "AVG(`precipitation`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -365,7 +365,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "rain",
+                  "fieldName": "avg(precipitation)",
                   "format": {
                     "type": "number-plain",
                     "abbreviation": "none",
@@ -399,11 +399,11 @@
                   "datasetName": "a8096cb3",
                   "fields": [
                     {
-                      "name": "relative_humidity_2m",
-                      "expression": "`relative_humidity_2m`"
+                      "name": "avg(relative_humidity_2m)",
+                      "expression": "AVG(`relative_humidity_2m`)"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -416,7 +416,7 @@
               "widgetType": "counter",
               "encodings": {
                 "value": {
-                  "fieldName": "relative_humidity_2m",
+                  "fieldName": "avg(relative_humidity_2m)",
                   "format": {
                     "type": "number-plain",
                     "abbreviation": "none",
@@ -509,8 +509,8 @@
                   "datasetName": "a8096cb3",
                   "fields": [
                     {
-                      "name": "rain",
-                      "expression": "`rain`"
+                      "name": "avg(precipitation)",
+                      "expression": "AVG(`precipitation`)"
                     },
                     {
                       "name": "latitude",
@@ -519,33 +519,9 @@
                     {
                       "name": "longitude",
                       "expression": "`longitude`"
-                    },
-                    {
-                      "name": "place_name",
-                      "expression": "`place_name`"
-                    },
-                    {
-                      "name": "temperature_2m",
-                      "expression": "`temperature_2m`"
-                    },
-                    {
-                      "name": "weather_category",
-                      "expression": "`weather_category`"
-                    },
-                    {
-                      "name": "wind_speed_10m",
-                      "expression": "`wind_speed_10m`"
-                    },
-                    {
-                      "name": "wind_gusts_10m",
-                      "expression": "`wind_gusts_10m`"
-                    },
-                    {
-                      "name": "wind_direction_description",
-                      "expression": "`wind_direction_description`"
                     }
                   ],
-                  "disaggregated": true
+                  "disaggregated": false
                 }
               }
             ],
@@ -556,7 +532,8 @@
                 "showTitle": true
               },
               "mark": {
-                "size": 1
+                "opacity": 0.69,
+                "size": -2.2
               },
               "widgetType": "symbol-map",
               "encodings": {
@@ -569,16 +546,7 @@
                   }
                 },
                 "color": {
-                  "fieldName": "rain",
-                  "format": {
-                    "type": "number-plain",
-                    "abbreviation": "none",
-                    "decimalPlaces": {
-                      "type": "exact",
-                      "places": 2
-                    }
-                  },
-                  "displayName": "Lluvia (mm)",
+                  "fieldName": "avg(precipitation)",
                   "scale": {
                     "type": "quantitative",
                     "colorRamp": {
@@ -588,51 +556,11 @@
                   }
                 },
                 "size": {
-                  "fieldName": "rain",
+                  "fieldName": "avg(precipitation)",
                   "scale": {
                     "type": "quantitative"
-                  },
-                  "format": {
-                    "type": "number-plain",
-                    "abbreviation": "none",
-                    "decimalPlaces": {
-                      "type": "exact",
-                      "places": 2
-                    }
                   }
-                },
-                "extra": [
-                  {
-                    "fieldName": "place_name",
-                    "displayName": "Ubicación"
-                  },
-                  {
-                    "fieldName": "temperature_2m",
-                    "format": {
-                      "type": "number-plain",
-                      "abbreviation": "none",
-                      "decimalPlaces": {
-                        "type": "exact",
-                        "places": 1
-                      }
-                    },
-                    "formatTemplate": "{{ @formatted }}°C",
-                    "displayName": "Temperatura"
-                  },
-                  {
-                    "fieldName": "weather_category",
-                    "displayName": "Categoría"
-                  },
-                  {
-                    "fieldName": "wind_speed_10m"
-                  },
-                  {
-                    "fieldName": "wind_gusts_10m"
-                  },
-                  {
-                    "fieldName": "wind_direction_description"
-                  }
-                ]
+                }
               },
               "data": {
                 "queryName": "main_query"
@@ -656,8 +584,8 @@
                   "datasetName": "077fc02d",
                   "fields": [
                     {
-                      "name": "avg(wind_speed_10m)",
-                      "expression": "AVG(`wind_speed_10m`)"
+                      "name": "avg(relative_humidity_2m)",
+                      "expression": "AVG(`relative_humidity_2m`)"
                     },
                     {
                       "name": "province",
@@ -673,7 +601,7 @@
               "widgetType": "bar",
               "encodings": {
                 "x": {
-                  "fieldName": "avg(wind_speed_10m)",
+                  "fieldName": "avg(relative_humidity_2m)",
                   "scale": {
                     "type": "quantitative"
                   }
@@ -747,6 +675,58 @@
             "width": 5,
             "height": 4
           }
+        },
+        {
+          "widget": {
+            "name": "1fadeffb",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "a8096cb3",
+                  "fields": [
+                    {
+                      "name": "last(timestamp)",
+                      "expression": "LAST(`timestamp`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`latitude` IN (`latitude`) OR TRUE"
+                    },
+                    {
+                      "expression": "`longitude` IN (`longitude`) OR TRUE"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "title": "Ultima Captura",
+                "showTitle": true,
+                "showDescription": true
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "last(timestamp)",
+                  "formatTemplate": "{{ @formatted }}"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 7,
+            "y": 0,
+            "width": 5,
+            "height": 1
+          }
         }
       ],
       "pageType": "PAGE_TYPE_CANVAS",
@@ -754,6 +734,7 @@
     }
   ],
   "uiSettings": {
+    "locale": "es-CO",
     "theme": {
       "canvasBackgroundColor": {
         "light": "#E6E9EA",

@@ -1,41 +1,26 @@
-spot,activity,area,latitude,longitude
-Punta Chame Main Beach,Kitesurf,Punta Chame,8.6442,-79.7070
-Punta Chame Home Lagoon,Kitesurf,Punta Chame,8.6420,-79.7080
-Punta Chame Sand Bars,Kitesurf,Punta Chame,8.6210,-79.7350
-Punta Chame Mangrove Lagoons,Kitesurf,Punta Chame,8.6370,-79.7340
-Isla Taborcillo,Kitesurf,Punta Chame,8.6100,-79.7540
-Punta Chame Beach,Tourism,Punta Chame,8.6442,-79.7070
-Chame Bay Mangroves,Tourism,Punta Chame,8.6370,-79.7340
-Playa Caracol,Surf,Punta Chame / Chame,8.6116,-79.8537
-Playa Malibu,Surf,Gorgona,8.5500,-79.8750
-Playa Teta,Surf,Coronado,8.5100,-79.9100
-Playa El Palmar,Surf,San Carlos,8.4674,-79.9541
-Rio Mar,Surf,San Carlos,8.4560,-80.0180
-Cerro Chame,Hiking,Chame,8.5987,-79.8345
-Los Cajones de Chame,Hiking,Chame,8.6491,-79.9787
-Cerro Campana,Hiking,Altos de Campana,8.6870,-79.9310
-Altos de Campana Viewpoint,Tourism,Altos de Campana,8.6819,-79.8450
-Coronado Beach,Tourism,Coronado,8.5330,-79.8850
-Gorgona Beach,Tourism,Gorgona,8.5530,-79.8780
-El Valle de Anton,Tourism,El Valle,8.6060,-80.1300
-La India Dormida,Hiking,El Valle,8.6065,-80.1325
-Casco Viejo,Tourism,Panama City,8.9520,-79.5350
-Panama Viejo,Tourism,Panama City,9.0069,-79.4855
-Cinta Costera,Walking,Panama City,8.9733,-79.5302
-Avenida Balboa,Running,Panama City,8.9741,-79.5269
-Amador Causeway,Cycling,Panama City,8.9106,-79.5319
-Biomuseo,Museum,Amador,8.9345,-79.5448
-Punta Culebra Nature Center,Tourism,Amador,8.9102,-79.5290
-Miraflores Visitor Center,Tourism,Panama Canal Area,9.0027,-79.5907
-Cerro Ancon,Hiking,Panama City,8.9590,-79.5490
-Parque Natural Metropolitano,Hiking,Panama City,8.9890,-79.5430
-Mi Pueblito,Tourism,Panama City,8.9616,-79.5478
-Mercado de Mariscos,Gastronomy,Panama City,8.9568,-79.5386
-Parque Omar,Running,San Francisco,8.9936,-79.5143
-Plaza de Francia,Tourism,Casco Viejo,8.9504,-79.5320
-Catedral Metropolitana,Tourism,Casco Viejo,8.9524,-79.5352
-Calle Uruguay,Nightlife,Panama City,8.9818,-79.5257
-Cinta Costera Bike Path,Cycling,Panama City,8.9715,-79.5290
-Causeway Islands,Tourism,Amador,8.9080,-79.5270
-Cerro Cedro Mirador,Hiking,Panama City,8.9910,-79.5460
-Camino de Cruces,Hiking,Panama Canal Area,9.0280,-79.5710
+latitude,longitude,display_name,country,city,province,place_name
+7.6977152824401855,-81.26806640625,"El Tigre de Los Amarillos, Hicaco, Soná, Veraguas, Panamá",Panamá,Hicaco,Veraguas,El Tigre de Los Amarillos
+7.557117938995361,-81.20645141601562,"Puerto Viejo, Gobernadora, Montijo, Veraguas, Panamá",Panamá,Gobernadora,Veraguas,Puerto Viejo
+8.822495460510254,-80.91458129882812,"Urracá, Calovébora, Santa Fe, Veraguas, Panamá",Panamá,Calovébora,Veraguas,Urracá
+7.6977152824401855,-80.425537109375,"Los Bastoncillos, Espino Amarillo, Macaracas, Los Santos, Panamá",Panamá,Espino Amarillo,Los Santos,
+7.486819267272949,-81.74871826171875,"Montijo, Veraguas, Panamá",Panamá,null,Veraguas,Montijo
+8.752197265625,-82.39657592773438,"Vía Alto Jaramillo, Alto Jaramillo, Jaramillo, Boquete, Chiriquí, 0413, Panamá",Panamá,Jaramillo,Chiriquí,Vía Alto Jaramillo
+7.838313102722168,-81.56011962890625,"Bahía Honda, Soná, Veraguas, Panamá",Panamá,Bahía Honda,Veraguas,Bahía Honda
+9.033391952514648,-79.4896240234375,"Cristo Rey, José Domingo Espinar, San Miguelito, Panamá, Provincia de Panamá, 0801, Panamá",Panamá,Panamá,Provincia de Panamá,
+8.049209594726562,-81.30767822265625,"Bajo del Cobre, Rodeo Viejo, Soná, Veraguas, Panamá",Panamá,Rodeo Viejo,Veraguas,
+8.68189811706543,-80,"El Manglarito, Chame, Panamá Oeste, Panamá",Panamá,El Manglarito,Panamá Oeste,El Manglarito
+8.471001625061035,-80.02578735351562,"El Higo, San Carlos, Panamá Oeste, Panamá",Panamá,San Carlos,Panamá Oeste,
+8.61159896850586,-79.69879150390625,"Punta Chame, Chame, Panamá Oeste, Panamá",Panamá,Punta Chame,Panamá Oeste,Punta Chame
+8.61159896850586,-80.16351318359375,"La Pintada, El Valle, Antón, Coclé, 0212, Panamá",Panamá,El Valle,Coclé,La Pintada
+8.61159896850586,-79.93115234375,"Chame, Panamá Oeste, Panamá",Panamá,null,Panamá Oeste,
+7.978910446166992,-81.08453369140625,"Monjarras, Montijo, Veraguas, Panamá",Panamá,Montijo,Veraguas,
+8.963092803955078,-79.57647705078125,"Calle Walker, Diablo Heights, Ancón, Distrito de Panamá, Provincia de Panamá, 0843, Panamá",Panamá,Ancón,Provincia de Panamá,Calle Walker
+9.033391952514648,-79.56747436523438,"Valle de San Francisco, Ancón, Distrito de Panamá, Provincia de Panamá, Panamá",Panamá,Ancón,Provincia de Panamá,Valle de San Francisco
+9.384885787963867,-82.2589111328125,"Barriada techos de esperanza - La solución, La Carretera, Boca del Drago, Bocas del Toro, 0101, Panamá",Panamá,Bocas del Toro,Bocas del Toro,
+7.275922775268555,-80.47418212890625,"Cambutal, Tonosí, Los Santos, Panamá",Panamá,Cambutal,Los Santos,Cambutal
+8.541300773620605,-79.93978881835938,"San José, San Carlos, Panamá Oeste, Panamá",Panamá,San Carlos,Panamá Oeste,
+8.68189811706543,-79.844970703125,"Sajalices, Chame, Panamá Oeste, Panamá",Panamá,Sajalices,Panamá Oeste,
+8.61159896850586,-79.85369873046875,"Pajonal, Chame, Panamá Oeste, Panamá",Panamá,Chame,Panamá Oeste,
+8.61159896850586,-80.00860595703125,"Chame, Panamá Oeste, Panamá",Panamá,null,Panamá Oeste,
+8.822495460510254,-82.54531860351562,"El Desierto, Cerro Punta, Tierras Altas, Chiriquí, Panamá",Panamá,Cerro Punta,Chiriquí,El Desierto
+7.486819267272949,-80.44989013671875,"Tonosí, Los Santos, Panamá",Panamá,Tonosí,Los Santos,Tonosí

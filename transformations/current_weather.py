@@ -1,18 +1,52 @@
 from pyspark import pipelines as dp
 import pyspark.sql.functions as F
 from pyspark.sql.window import Window
+from transformations_common import (
+    create_bronze_weather_stream,
+    parse_timestamp_column,
+    transform_weather_columns,
+    enrich_with_weather_codes
+)
 
-@dp.table(name="last_24_hour_weather")
-def last_24_hour_weather():
-    silver_current = spark.read.table("weather.forecast_and_current_weather.silver_current_weather")
-    measurement_points = spark.read.table("weather.forecast_and_current_weather.openmeteo_measurement_points")
+# Configuration
+username = spark.conf.get("username")
+bronze_folder = f"/Workspace/Users/{username}/openmeteo-databricks-pipeline/data/forecast/current"
+
+
+@dp.table
+def bronze_current_weather():
+    """Bronze layer: Raw ingestion from JSON files"""
+    return create_bronze_weather_stream(spark, bronze_folder)
+
+
+@dp.table
+def silver_current_weather():
+    """Silver layer: Cleaned and transformed current weather data"""
+    # Read from bronze
+    src_table = spark.readStream.table("bronze_current_weather")
     
-    cutoff_time = F.expr("current_timestamp() - interval 24 hours")
+    # Parse timestamp
+    src_table = parse_timestamp_column(src_table)
+    
+    # Transform columns
+    transformed = transform_weather_columns(src_table)
+    
+    # Enrich with weather codes
+    return enrich_with_weather_codes(spark,transformed)
+
+
+
+@dp.table
+def last_8_hour_weather():
+    silver_current = dp.read("silver_current_weather")
+    sites = spark.read.table("locations")
+    
+    cutoff_time = F.expr("current_timestamp() - interval 8 hours")
     
     return (
         silver_current.alias("l")
         .join(
-            measurement_points.alias("r"),
+            sites.alias("r"),
             (F.col("l.latitude") == F.col("r.latitude")) & 
             (F.col("l.longitude") == F.col("r.longitude")),
             "left"
@@ -28,10 +62,9 @@ def last_24_hour_weather():
     )
 
 
-@dp.table(name="last_weather")
+@dp.table
 def last_weather():
-    df = spark.read.table("last_24_hour_weather")
-    
+    df = dp.read("last_8_hour_weather")
     return (
         df
         .withColumn(
