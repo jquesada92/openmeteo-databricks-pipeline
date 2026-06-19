@@ -1,473 +1,459 @@
-# Taller UTP Databricks - Pipeline de Mediciones del Clima
+# Open-Meteo Databricks Pipeline
 
-Este proyecto implementa pipelines de datos usando arquitectura Medallion (Bronze → Silver) para procesar mediciones meteorológicas en formato JSON, incluyendo datos en tiempo real, históricos y pronósticos.
+Pipeline de datos meteorológicos en tiempo real usando Databricks Lakeflow Spark Declarative Pipelines (SDP) con arquitectura Medallion para procesar datos de pronósticos del clima desde la API Open-Meteo.
 
-## 📋 Descripción
+## 📋 Descripción General
 
-El proyecto procesa tres tipos de datos del clima:
+Este proyecto implementa un pipeline ETL completo que:
+* Ingiere datos de pronósticos meteorológicos desde la API Open-Meteo
+* Procesa datos usando arquitectura Medallion (Bronze → Silver → Gold)
+* Implementa Change Data Capture (CDC) con SCD Type 2 para rastrear cambios históricos
+* Proporciona datos limpios y enriquecidos para análisis y visualización
 
-### 🌤️ Datos en Tiempo Real (Current Weather)
-- Mediciones actuales del clima
-- Actualización continua en tiempo real
-- Incluye: temperatura, humedad, precipitación, viento, presión, etc.
+## 🏗️ Arquitectura de Datos y Lineage
 
-### 📚 Datos Históricos (Historical Weather)
-- Registros históricos de mediciones pasadas
-- Para análisis de tendencias y patrones
-- Datos agregados por períodos de tiempo
-
-### 🔮 Pronósticos (Forecast Weather)
-- Predicciones meteorológicas futuras
-- Pronósticos a corto, mediano y largo plazo
-- Incluye probabilidades y rangos de confianza
-
-**Datos procesados incluyen:**
-- Coordenadas geográficas (latitud, longitud, elevación)
-- Temperatura y humedad relativa
-- Precipitación y lluvia
-- Velocidad y dirección del viento
-- Código de clima y estado día/noche
-- Timestamps de las mediciones
-
-## 🏗️ Arquitectura
+### Pipeline de Pronóstico Horario (Forecast)
 
 ```
-CATÁLOGO: weather
-│
-├── SCHEMA: current_weather (Tiempo Real)
-│   ├── data/mediciones_del_clima/current/*.json
-│   │   ↓
-│   ├── [Bronze Layer] bronze_current_weather
-│   │   ↓
-│   └── [Silver Layer] silver_current_weather
-│
-├── SCHEMA: historical_weather (Histórico)
-│   ├── data/mediciones_del_clima/historical/*.json
-│   │   ↓
-│   ├── [Bronze Layer] bronze_historical_weather
-│   │   ↓
-│   └── [Silver Layer] silver_historical_weather
-│
-└── SCHEMA: forecast_weather (Pronóstico)
-    ├── data/mediciones_del_clima/forecast/*.json
-    │   ↓
-    ├── [Bronze Layer] bronze_forecast_weather
-    │   ↓
-    └── [Silver Layer] silver_forecast_weather
+📁 Archivos JSON (/data/forecast/hourly/*.json)
+        ↓ [Auto Loader - cloudFiles]
+        
+🟤 BRONZE LAYER
+├─ raw_hourly_forecast_weather (Streaming Table)
+│  └─ Ingesta cruda con Auto Loader
+│  └─ Schema evolution habilitado
+│  
+       ↓ [Auto CDC Flow]
+       
+├─ bronze_hourly_forecast_weather_scd_type2 (Streaming Table - SCD Type 2)
+│  └─ Rastreo de cambios históricos
+│  └─ Keys: [latitude, longitude, timestamp]
+│  └─ Sequence by: query_timestamp
+│  └─ Liquid Clustering: [latitude, longitude]
+│  └─ Columnas rastreadas: weather_code, precipitation, rain, temperatures, wind_direction
+│  
+       ↓ [Transformaciones + Enriquecimiento]
+       
+⚪ SILVER LAYER
+├─ silver_hourly_forecast_weather (Materialized View)
+│  └─ Timestamps parseados (date, hour)
+│  └─ Columnas de clima transformadas
+│  └─ Enriquecido con weather_codes
+│  └─ Descripciones de dirección de viento
+│  
+       ↓ [Filtros temporales + Join con locations]
+       
+🟡 GOLD LAYER
+└─ next_24_and_past_12_weather (Materialized View)
+   └─ Últimas 12 horas + próximas 24 horas
+   └─ Join con tabla de ubicaciones
+   └─ Información geográfica enriquecida (país, provincia, ciudad)
 ```
+
+### Pipeline de Clima Actual (Current Weather)
+
+```
+📁 Archivos JSON (/data/forecast/current/*.json)
+        ↓ [Auto Loader]
+        
+🟤 BRONZE LAYER
+├─ bronze_current_weather (Streaming Table)
+│  
+       ↓ [Parse + Transform + Enrich]
+       
+⚪ SILVER LAYER
+├─ silver_current_weather (Streaming Table)
+│  
+       ↓ [Filter últimas 8 horas + Join locations]
+       
+🟡 GOLD LAYER
+├─ last_8_hour_weather (Materialized View)
+│  
+       ↓ [Window function - max timestamp]
+       
+└─ last_weather (Materialized View)
+   └─ Última medición por ubicación
+```
+
+### Tablas de Referencia
+
+```
+📋 REFERENCE TABLES
+├─ locations
+│  └─ Información geográfica (país, provincia, ciudad, coordenadas)
+│  └─ Usado en joins de capas Gold
+│
+└─ weather_codes
+   └─ Diccionario de códigos de clima
+   └─ Categorías e intensidades
+   └─ Broadcast join en Silver layer
+```
+
+## 📊 Datasets y Schemas
+
+### Catálogo: `weather`
+#### Schema: `forecast_and_current_weather`
+
+| Dataset | Tipo | Layer | Filas | Descripción |
+|---------|------|-------|-------|-------------|
+| `raw_hourly_forecast_weather` | Streaming Table | Bronze | 33,408 | Ingesta cruda de pronósticos horarios |
+| `bronze_hourly_forecast_weather_scd_type2` | Streaming Table (SCD2) | Bronze | - | Histórico de cambios en pronósticos |
+| `silver_hourly_forecast_weather` | Materialized View | Silver | 32,118 | Pronósticos transformados y enriquecidos |
+| `next_24_and_past_12_weather` | Materialized View | Gold | - | Ventana temporal de 36 horas |
+| `bronze_current_weather` | Streaming Table | Bronze | - | Ingesta cruda de clima actual |
+| `silver_current_weather` | Streaming Table | Silver | - | Clima actual transformado |
+| `last_8_hour_weather` | Materialized View | Gold | - | Últimas 8 horas de mediciones |
+| `last_weather` | Materialized View | Gold | - | Última medición por ubicación |
+| `locations` | Table | Reference | - | Catálogo de ubicaciones |
+| `weather_codes` | Table | Reference | - | Códigos de clima |
+
+### Columnas Clave
+
+**Coordenadas y Ubicación:**
+* `latitude`, `longitude`, `elevation`
+* `country`, `province`, `city`, `place_name`
+* `timezone`, `timezone_abbreviation`
+
+**Temporal:**
+* `timestamp` - Timestamp completo
+* `date` - Fecha (DATE)
+* `hour` - Hora (HH:mm:ss)
+* `query_timestamp` - Momento de la consulta API
+* `__START_AT`, `__END_AT` - Validez temporal (solo SCD Type 2)
+
+**Variables Meteorológicas:**
+* `temperature_2m`, `temperature_80m`, `temperature_120m`, `temperature_180m`
+* `precipitation`, `rain`, `showers`
+* `relative_humidity_2m`
+* `pressure_msl` - Presión al nivel del mar
+* `weather_code` - Código WMO del clima
+* `wind_speed_10m`, `wind_speed_80m`, `wind_speed_120m`, `wind_speed_180m`
+* `wind_direction_10m`, `wind_direction_80m`, `wind_direction_120m`, `wind_direction_180m`
+* `description_wind_direction_*` - Descripciones textuales (N, NE, E, SE, etc.)
+* `wind_gusts_10m`
+
+**Metadatos:**
+* `metadata_ingestion_timestamp` - Timestamp de ingesta en pipeline
 
 ## 📂 Estructura del Proyecto
 
 ```
-taller-utp-databricks/
-├── README.md                              # Este archivo
-├── setup.sql                              # Script de configuración inicial
-├── data/
-│   └── mediciones_del_clima/
-│       ├── current/                       # Archivos JSON - Tiempo real
-│       ├── historical/                    # Archivos JSON - Histórico
-│       └── forecast/                      # Archivos JSON - Pronósticos
-├── transformations/
-│   ├── current_weather.py                 # Pipeline de datos actuales
-│   ├── historical_weather.py              # Pipeline de datos históricos
-│   └── forecast_weather.py                # Pipeline de pronósticos
-├── script/                                # Scripts auxiliares
-├── utils.py                               # Utilidades
-├── open_meteo_weather_ingestion.py        # Script de ingesta
-└── generate_ingestion_files               # Notebook de generación
+openmeteo-databricks-pipeline/
+├── README.md                                   # Este archivo
+├── .gitignore                                  # Archivos excluidos de Git
+│
+├── data/                                       # Datos de origen
+│   ├── locations.csv                           # Catálogo de ubicaciones
+│   └── forecast/
+│       ├── current/                            # JSON - Clima actual
+│       └── hourly/                             # JSON - Pronósticos horarios
+│
+├── scripts/                                    # Scripts de ingesta
+│   ├── open_meteo_weather_ingestion.py         # Cliente API Open-Meteo
+│   └── utils.py                                # Funciones auxiliares
+│
+└── transformations/                            # Pipeline SDP
+    ├── forecast.py                             # Pipeline de pronósticos
+    ├── current_weather.py                      # Pipeline de clima actual
+    └── transformations_common.py               # Funciones compartidas
 ```
 
-## ⚙️ Configuración Paso a Paso
+## 🔧 Tecnologías y Componentes
 
-### 🚀 Opción Rápida: Usar el Script de Setup
+### Databricks Features
+* **Lakeflow Spark Declarative Pipelines (SDP)** - Framework ETL declarativo
+* **Auto Loader (cloudFiles)** - Ingesta incremental de archivos
+* **Auto CDC Flow** - Change Data Capture con SCD Type 2
+* **Liquid Clustering** - Optimización de queries
+* **Unity Catalog** - Gobierno de datos
 
-**La forma más fácil de configurar el proyecto es usando el script `setup.sql`:**
+### Procesamiento
+* **PySpark** - Transformaciones distribuidas
+* **Streaming Tables** - Procesamiento continuo
+* **Materialized Views** - Vistas optimizadas con refresh incremental
 
-1. Abre un **nuevo notebook SQL** en Databricks
-2. Copia todo el contenido del archivo `setup.sql`
-3. Ejecuta todas las celdas en orden
-4. Continúa con el **Paso 3** para crear los pipelines
+### API y Datos
+* **Open-Meteo API** - Proveedor de datos meteorológicos
+* **requests-cache** - Cache de respuestas API (1 hora)
+* **retry-requests** - Reintentos automáticos con backoff exponencial
 
-El script `setup.sql` es idempotente (puedes ejecutarlo múltiples veces sin problemas) y automáticamente:
-- ✅ Crea el catálogo `weather`
-- ✅ Crea los 3 schemas: `current_weather`, `historical_weather`, `forecast_weather`
-- ✅ Verifica la configuración
-- ✅ Muestra información útil sobre la estructura creada
+## ⚙️ Configuración del Pipeline
 
----
+### Pipeline: `dlt_forecast_hourly_weather`
 
-### Configuración Manual (Alternativa)
+**Settings:**
+* **Pipeline Type:** Workspace
+* **Target:** `weather.forecast_and_current_weather`
+* **Root Path:** `/Workspace/Users/{username}/openmeteo-databricks-pipeline/transformations`
+* **Source Code:** `transformations/forecast.py`
+* **Serverless:** ✅ Enabled
+* **Photon:** ✅ Enabled
+* **Channel:** CURRENT
+* **Development:** ❌ (Production mode)
 
-Si prefieres crear la infraestructura manualmente, sigue estos pasos:
-
-### Paso 1: Crear el Catálogo Unity Catalog
-
-1. Abre el **Data Explorer** en Databricks o ejecuta en un notebook:
-
-```sql
--- Crear el catálogo
-CREATE CATALOG IF NOT EXISTS weather
-COMMENT 'Catálogo para datos meteorológicos del taller UTP';
-
--- Verificar que se creó
-SHOW CATALOGS LIKE 'weather';
+**Configuration Parameters:**
+```python
+{
+  "username": "jaquesada92@outlook.com",
+  "mode": "hourly"
+}
 ```
 
-### Paso 2: Crear los Schemas
+### Características SCD Type 2
+
+El dataset `bronze_hourly_forecast_weather_scd_type2` implementa:
+
+* **Primary Keys:** `[latitude, longitude, timestamp]`
+* **Sequence Column:** `query_timestamp` - Ordena eventos
+* **Tracked Columns:** Columnas cuyos cambios se rastrean:
+  * `weather_code`, `precipitation`, `rain`, `showers`
+  * `temperature_2m`, `temperature_80m`, `temperature_120m`, `temperature_180m`
+  * `wind_direction_10m`, `wind_direction_80m`, `wind_direction_120m`, `wind_direction_180m`
+
+**Columnas Generadas por SCD Type 2:**
+* `__START_AT` - Inicio de validez del registro
+* `__END_AT` - Fin de validez (NULL = registro actual)
+
+## 🚀 Uso
+
+### 1. Configuración Inicial
 
 ```sql
--- Usar el catálogo
-USE CATALOG weather;
-
--- Schema 1: Datos en tiempo real
-CREATE SCHEMA IF NOT EXISTS current_weather
-COMMENT 'Schema para mediciones actuales del clima en tiempo real';
-
--- Schema 2: Datos históricos
-CREATE SCHEMA IF NOT EXISTS historical_weather
-COMMENT 'Schema para datos históricos del clima';
-
--- Schema 3: Pronósticos
-CREATE SCHEMA IF NOT EXISTS forecast_weather
-COMMENT 'Schema para pronósticos del clima';
-
--- Verificar que se crearon
-SHOW SCHEMAS IN weather;
-```
-
-### Paso 3: Crear los Pipelines
-
-Debes crear **3 pipelines separados**, uno para cada schema:
-
-#### Pipeline 1: Current Weather (Tiempo Real)
-
-1. Ve a **Workflows** → **Lakeflow Pipelines** → **Create Pipeline**
-2. Configura:
-   - **Pipeline name**: `weather-current-pipeline`
-   - **Product edition**: `Advanced` (o `Core`)
-   - **Source code**: `/Workspace/Users/<tu-usuario>/taller-utp-databricks/transformations`
-   - **Target catalog**: `weather`
-   - **Target schema**: `current_weather`
-3. En **Configuration**, agrega:
-   ```
-   username: <tu-email-databricks>
-   ```
-
-#### Pipeline 2: Historical Weather (Histórico)
-
-1. Crea un nuevo pipeline
-2. Configura:
-   - **Pipeline name**: `weather-historical-pipeline`
-   - **Product edition**: `Advanced` (o `Core`)
-   - **Source code**: `/Workspace/Users/<tu-usuario>/taller-utp-databricks/transformations`
-   - **Target catalog**: `weather`
-   - **Target schema**: `historical_weather`
-3. En **Configuration**, agrega:
-   ```
-   username: <tu-email-databricks>
-   ```
-
-#### Pipeline 3: Forecast Weather (Pronóstico)
-
-1. Crea un nuevo pipeline
-2. Configura:
-   - **Pipeline name**: `weather-forecast-pipeline`
-   - **Product edition**: `Advanced` (o `Core`)
-   - **Source code**: `/Workspace/Users/<tu-usuario>/taller-utp-databricks/transformations`
-   - **Target catalog**: `weather`
-   - **Target schema**: `forecast_weather`
-3. En **Configuration**, agrega:
-   ```
-   username: <tu-email-databricks>
-   ```
-
-### Paso 4: Verificar las Tablas Creadas
-
-Ejecuta estas consultas en un notebook para verificar:
-
-```sql
--- Ver todas las tablas creadas en cada schema
-SHOW TABLES IN weather.current_weather;
-SHOW TABLES IN weather.historical_weather;
-SHOW TABLES IN weather.forecast_weather;
-
--- Verificar datos en las tablas de tiempo real
-SELECT 
-  date,
-  time,
-  temperature_2m,
-  precipitation,
-  wind_speed_10m
-FROM weather.current_weather.silver_current_weather
-ORDER BY date DESC, time DESC
-LIMIT 10;
-
--- Verificar datos históricos
-SELECT 
-  date,
-  temperature_2m,
-  precipitation
-FROM weather.historical_weather.silver_historical_weather
-ORDER BY date DESC
-LIMIT 10;
-
--- Verificar pronósticos
-SELECT 
-  date,
-  time,
-  temperature_2m,
-  precipitation
-FROM weather.forecast_weather.silver_forecast_weather
-ORDER BY date ASC, time ASC
-LIMIT 10;
-```
-
-## 🔍 Descripción de los Schemas y Tablas
-
-### Schema: current_weather
-
-**Propósito**: Mediciones meteorológicas en tiempo real
-
-#### bronze_current_weather
-- **Tipo**: Streaming Table
-- **Fuente**: Auto Loader (cloudFiles) sobre archivos JSON
-- **Schema Evolution**: Habilitado
-- **Datos**: Crudos sin transformación
-
-#### silver_current_weather
-- **Tipo**: Streaming Table
-- **Transformaciones**:
-  - Conversión de timestamp Unix a columnas `date` y `time`
-  - Limpieza y validación de datos
-  - Organización de columnas por categoría
-
-### Schema: historical_weather
-
-**Propósito**: Datos históricos para análisis de tendencias
-
-#### bronze_historical_weather
-- **Tipo**: Streaming Table
-- **Fuente**: Auto Loader sobre archivos JSON históricos
-- **Datos**: Registros pasados sin procesar
-
-#### silver_historical_weather
-- **Tipo**: Streaming Table
-- **Transformaciones**:
-  - Agregaciones temporales
-  - Cálculo de estadísticas (promedios, máximos, mínimos)
-  - Formato optimizado para consultas analíticas
-
-### Schema: forecast_weather
-
-**Propósito**: Pronósticos meteorológicos futuros
-
-#### bronze_forecast_weather
-- **Tipo**: Streaming Table
-- **Fuente**: Auto Loader sobre archivos JSON de pronósticos
-- **Datos**: Predicciones crudas del clima
-
-#### silver_forecast_weather
-- **Tipo**: Streaming Table
-- **Transformaciones**:
-  - Separación de fecha y hora
-  - Organización de predicciones por horizonte temporal
-  - Cálculo de intervalos de confianza
-
-## 🚨 Troubleshooting
-
-### Error: "Catalog 'weather' does not exist"
-
-**Solución**: Ejecuta el script `setup.sql` o crea el catálogo manualmente:
-
-```sql
+-- Crear catálogo si no existe
 CREATE CATALOG IF NOT EXISTS weather;
+
+-- Crear schema
+CREATE SCHEMA IF NOT EXISTS weather.forecast_and_current_weather;
+
+-- Cargar tabla de ubicaciones
+-- (Importar desde data/locations.csv)
 ```
 
-### Error: "Schema 'current_weather' / 'historical_weather' / 'forecast_weather' does not exist"
+### 2. Ejecutar Ingesta de Datos
 
-**Solución**: Ejecuta el script `setup.sql` completo que crea los 3 schemas, o créalos manualmente:
+```python
+from scripts.open_meteo_weather_ingestion import OpenMeteoWeatherIngestion
 
-```sql
-USE CATALOG weather;
-CREATE SCHEMA IF NOT EXISTS current_weather;
-CREATE SCHEMA IF NOT EXISTS historical_weather;
-CREATE SCHEMA IF NOT EXISTS forecast_weather;
-```
-
-### Error: "Pipeline configuration parameter 'username' not found"
-
-**Solución**: 
-1. Ve a Pipeline Settings → Configuration
-2. Agrega el parámetro `username` con tu correo de Databricks
-
-### Error: "No files found in path"
-
-**Solución**: Verifica que los archivos JSON existen en las carpetas correspondientes:
-```
-/Workspace/Users/<tu-usuario>/taller-utp-databricks/data/mediciones_del_clima/current/
-/Workspace/Users/<tu-usuario>/taller-utp-databricks/data/mediciones_del_clima/historical/
-/Workspace/Users/<tu-usuario>/taller-utp-databricks/data/mediciones_del_clima/forecast/
-```
-
-### Los pipelines se interfieren entre sí
-
-**Solución**: Asegúrate de que cada pipeline apunta al schema correcto:
-- Pipeline current → schema `current_weather`
-- Pipeline historical → schema `historical_weather`
-- Pipeline forecast → schema `forecast_weather`
-
-## 📊 Consultas de Ejemplo
-
-### Comparar temperatura actual vs pronóstico
-
-```sql
-SELECT 
-  c.date,
-  c.time,
-  c.temperature_2m as temp_actual,
-  f.temperature_2m as temp_pronosticada,
-  ROUND(ABS(c.temperature_2m - f.temperature_2m), 2) as diferencia
-FROM weather.current_weather.silver_current_weather c
-INNER JOIN weather.forecast_weather.silver_forecast_weather f
-  ON c.date = f.date 
-  AND c.time = f.time
-  AND c.latitude = f.latitude
-  AND c.longitude = f.longitude
-ORDER BY c.date DESC, c.time DESC
-LIMIT 20;
-```
-
-### Análisis de tendencias históricas
-
-```sql
-SELECT 
-  date,
-  ROUND(AVG(temperature_2m), 2) as temp_promedio,
-  ROUND(MIN(temperature_2m), 2) as temp_minima,
-  ROUND(MAX(temperature_2m), 2) as temp_maxima,
-  ROUND(AVG(precipitation), 2) as precipitacion_promedio
-FROM weather.historical_weather.silver_historical_weather
-GROUP BY date
-ORDER BY date DESC
-LIMIT 30;
-```
-
-### Precisión de pronósticos
-
-```sql
-WITH pronosticos_vs_real AS (
-  SELECT 
-    h.date,
-    h.temperature_2m as temp_real,
-    f.temperature_2m as temp_pronosticada,
-    ABS(h.temperature_2m - f.temperature_2m) as error_absoluto
-  FROM weather.historical_weather.silver_historical_weather h
-  INNER JOIN weather.forecast_weather.silver_forecast_weather f
-    ON h.date = f.date
-    AND h.latitude = f.latitude
-    AND h.longitude = f.longitude
+# Inicializar cliente
+ingestion = OpenMeteoWeatherIngestion(
+    username="tu_usuario@ejemplo.com",
+    dbutils=dbutils
 )
-SELECT 
-  COUNT(*) as num_pronosticos,
-  ROUND(AVG(error_absoluto), 2) as error_promedio,
-  ROUND(MAX(error_absoluto), 2) as error_maximo,
-  ROUND(STDDEV(error_absoluto), 2) as desviacion_estandar
-FROM pronosticos_vs_real;
+
+# Obtener pronósticos horarios
+ingestion.get_weather(
+    latitude=[8.99, 9.36],  # Panamá
+    longitude=[-79.52, -79.89],
+    mode='hourly'
+)
+
+# Obtener clima actual
+ingestion.get_weather(
+    latitude=8.99,
+    longitude=-79.52,
+    mode='current'
+)
 ```
 
-### Alertas de condiciones extremas (tiempo real)
+### 3. Ejecutar Pipeline
+
+```python
+# Desde la UI de Databricks:
+# Workflows → Pipelines → dlt_forecast_hourly_weather → Start
+
+# O programáticamente:
+from databricks.sdk import WorkspaceClient
+
+w = WorkspaceClient()
+w.pipelines.start_update(
+    pipeline_id="22324c07-f417-4e26-b944-994a7f2e9d77",
+    full_refresh=False
+)
+```
+
+### 4. Consultar Datos
 
 ```sql
+-- Pronóstico para las próximas 24 horas
 SELECT 
-  date,
-  time,
-  latitude,
-  longitude,
-  temperature_2m,
-  wind_speed_10m,
-  precipitation,
-  CASE 
-    WHEN temperature_2m > 35 THEN '🔥 Calor Extremo'
-    WHEN temperature_2m < 0 THEN '❄️ Congelamiento'
-    WHEN wind_speed_10m > 60 THEN '💨 Vientos Fuertes'
-    WHEN precipitation > 50 THEN '🌧️ Lluvia Intensa'
-    ELSE '✅ Normal'
-  END as alerta
-FROM weather.current_weather.silver_current_weather
-WHERE temperature_2m > 35 
-   OR temperature_2m < 0 
-   OR wind_speed_10m > 60 
-   OR precipitation > 50
-ORDER BY date DESC, time DESC;
+    country,
+    city,
+    timestamp,
+    temperature_2m,
+    precipitation,
+    weather_code,
+    wind_speed_10m,
+    description_wind_direction_10m
+FROM weather.forecast_and_current_weather.next_24_and_past_12_weather
+WHERE timestamp >= current_timestamp()
+ORDER BY timestamp;
+
+-- Última medición por ubicación
+SELECT 
+    country,
+    city,
+    timestamp,
+    temperature_2m,
+    weather_code
+FROM weather.forecast_and_current_weather.last_weather
+ORDER BY country, city;
+
+-- Consultar histórico de cambios (SCD Type 2)
+SELECT 
+    latitude,
+    longitude,
+    timestamp,
+    temperature_2m,
+    __START_AT,
+    __END_AT
+FROM weather.forecast_and_current_weather.bronze_hourly_forecast_weather_scd_type2
+WHERE latitude = 8.99 
+  AND longitude = -79.52
+  AND __END_AT IS NOT NULL  -- Solo registros históricos
+ORDER BY __START_AT DESC;
 ```
 
-## 🔄 Mantenimiento
+## 📈 Funciones Comunes (transformations_common.py)
 
-### Actualizar pipelines después de cambios
+### `create_bronze_weather_stream(spark, source_folder)`
+Crea streaming dataframe con Auto Loader desde archivos JSON.
 
-1. Edita los archivos en `transformations/`:
-   - `current_weather.py`
-   - `historical_weather.py`
-   - `forecast_weather.py`
-2. Ve al pipeline correspondiente en la UI
-3. Haz clic en **Start** para aplicar cambios
+**Features:**
+* Schema evolution automático
+* Timestamp de ingesta
+* Formato: cloudFiles JSON
 
-### Agregar nuevos datos
+### `parse_timestamp_column(df, timestamp_col_name, timezone)`
+Parsea timestamps Unix (segundos o nanosegundos) a datetime.
 
-Coloca archivos JSON en las carpetas correspondientes:
-- Tiempo real: `data/mediciones_del_clima/current/`
-- Histórico: `data/mediciones_del_clima/historical/`
-- Pronóstico: `data/mediciones_del_clima/forecast/`
+**Transforma:**
+* `timestamp` → TIMESTAMP
+* `date` → DATE
+* `hour` → STRING (HH:mm:ss)
+* `query_timestamp` → TIMESTAMP
 
-El Auto Loader detectará automáticamente los nuevos archivos.
+### `transform_weather_columns(df)`
+Estandariza columnas meteorológicas.
 
-### Refresh completo de todas las tablas
+**Aplica:**
+* Cast a DOUBLE de variables numéricas
+* Genera descripciones de dirección de viento usando UDF
+
+### `enrich_with_weather_codes(spark, df)`
+Enriquece con tabla de referencia de códigos de clima.
+
+**Join:**
+* Broadcast join con `weather_codes`
+* Agrega categorías e intensidades
+
+## 🔍 Queries de Ejemplo
+
+### Análisis Temporal
 
 ```sql
--- Current Weather
-REFRESH TABLE weather.current_weather.bronze_current_weather;
-REFRESH TABLE weather.current_weather.silver_current_weather;
-
--- Historical Weather
-REFRESH TABLE weather.historical_weather.bronze_historical_weather;
-REFRESH TABLE weather.historical_weather.silver_historical_weather;
-
--- Forecast Weather
-REFRESH TABLE weather.forecast_weather.bronze_forecast_weather;
-REFRESH TABLE weather.forecast_weather.silver_forecast_weather;
+-- Evolución de temperatura en las próximas 24 horas
+SELECT 
+    city,
+    timestamp,
+    temperature_2m,
+    LAG(temperature_2m) OVER (
+        PARTITION BY latitude, longitude 
+        ORDER BY timestamp
+    ) as prev_temp,
+    temperature_2m - LAG(temperature_2m) OVER (
+        PARTITION BY latitude, longitude 
+        ORDER BY timestamp
+    ) as temp_change
+FROM weather.forecast_and_current_weather.next_24_and_past_12_weather
+WHERE timestamp >= current_timestamp()
+ORDER BY city, timestamp;
 ```
 
-## 📝 Notas Importantes
+### Agregaciones
 
-1. **Unity Catalog**: Este proyecto usa Unity Catalog. Asegúrate de tener permisos para crear catálogos y schemas.
+```sql
+-- Resumen diario por ciudad
+SELECT 
+    country,
+    city,
+    date,
+    AVG(temperature_2m) as avg_temp,
+    MAX(temperature_2m) as max_temp,
+    MIN(temperature_2m) as min_temp,
+    SUM(precipitation) as total_rain,
+    AVG(wind_speed_10m) as avg_wind
+FROM weather.forecast_and_current_weather.silver_hourly_forecast_weather
+GROUP BY country, city, date
+ORDER BY country, city, date;
+```
 
-2. **Múltiples Schemas**: El proyecto usa 3 schemas independientes para separar datos en tiempo real, históricos y pronósticos.
+### Detección de Cambios (SCD Type 2)
 
-3. **Auto Loader**: Todas las tablas Bronze usan Auto Loader para detección automática de nuevos archivos.
+```sql
+-- Identificar cuando cambió un pronóstico
+SELECT 
+    latitude,
+    longitude,
+    timestamp,
+    temperature_2m,
+    query_timestamp,
+    __START_AT,
+    __END_AT,
+    DATEDIFF(minute, __START_AT, __END_AT) as minutes_valid
+FROM weather.forecast_and_current_weather.bronze_hourly_forecast_weather_scd_type2
+WHERE __END_AT IS NOT NULL
+  AND temperature_2m IS NOT NULL
+ORDER BY latitude, longitude, timestamp, __START_AT DESC;
+```
 
-4. **Streaming Tables**: Todas las tablas son streaming tables para procesamiento incremental y eficiente.
+## 🎯 Casos de Uso
 
-5. **Pipelines Independientes**: Cada schema debe tener su propio pipeline configurado correctamente.
+1. **Dashboards en Tiempo Real** - Monitoreo de clima actual
+2. **Análisis Predictivo** - Planificación basada en pronósticos
+3. **Alertas Meteorológicas** - Detección de condiciones severas
+4. **Auditoría de Pronósticos** - Comparar predicciones vs realidad
+5. **Análisis de Cambios** - Cómo evolucionan los pronósticos
 
-6. **Script de Setup**: El archivo `setup.sql` crea toda la infraestructura de Unity Catalog necesaria.
+## 📝 Notas Técnicas
 
-## 🤝 Soporte
+### SCD Type 2 vs Streaming Tables Regulares
 
-Para problemas o preguntas sobre este proyecto:
-1. Revisa la sección de Troubleshooting
-2. Verifica los logs de cada pipeline en la UI de Databricks
-3. Consulta la documentación oficial de Databricks Lakeflow Pipelines
+**SCD Type 2 (`bronze_hourly_forecast_weather_scd_type2`):**
+* ✅ Mantiene historial completo de cambios
+* ✅ Permite auditar evolución de pronósticos
+* ✅ Columnas `__START_AT` y `__END_AT`
+* ⚠️ Mayor uso de almacenamiento
 
-## 📚 Referencias
+**Streaming Tables (`silver_hourly_forecast_weather`):**
+* ✅ Siempre muestra estado más reciente
+* ✅ Menor footprint de almacenamiento
+* ❌ No rastrea cambios históricos
 
-- [Databricks Lakeflow Pipelines Documentation](https://docs.databricks.com/workflows/delta-live-tables/index.html)
-- [Unity Catalog Documentation](https://docs.databricks.com/data-governance/unity-catalog/index.html)
-- [Auto Loader Documentation](https://docs.databricks.com/ingestion/auto-loader/index.html)
-- [Medallion Architecture](https://www.databricks.com/glossary/medallion-architecture)
+### Liquid Clustering
+
+El dataset SCD Type 2 usa liquid clustering en `[latitude, longitude]`:
+* ✅ Optimiza filtros por ubicación
+* ✅ Mejora performance de joins
+* ✅ Auto-optimización sin Z-ORDER manual
+
+### Materialized Views
+
+Las vistas materializadas en Silver y Gold:
+* ✅ Refresh incremental automático (en serverless)
+* ✅ Optimizadas para queries analíticos
+* ✅ Reducen latencia de consulta
+
+## 🔗 Referencias
+
+* [Open-Meteo API Documentation](https://open-meteo.com/en/docs)
+* [Databricks Lakeflow Pipelines](https://docs.databricks.com/workflows/delta-live-tables/index.html)
+* [Auto Loader](https://docs.databricks.com/ingestion/auto-loader/index.html)
+* [Change Data Capture](https://docs.databricks.com/workflows/delta-live-tables/delta-live-tables-cdc.html)
+* [Unity Catalog](https://docs.databricks.com/data-governance/unity-catalog/index.html)
 
 ---
 
-**Última actualización**: 2026-06-15
-**Versión del Pipeline**: 1.0
-**Schemas**: current_weather, historical_weather, forecast_weather
-**Autor**: Taller UTP Databricks
+**Autor:** Jose Quesada  
+**Email:** jaquesada92@outlook.com  
+**Last Updated:** Junio 19, 2026  
+**Pipeline ID:** `22324c07-f417-4e26-b944-994a7f2e9d77`

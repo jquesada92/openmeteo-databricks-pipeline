@@ -1,139 +1,6 @@
 {
   "datasets": [
     {
-      "name": "077fc02d",
-      "displayName": "last_24_hour_weather",
-      "config": {
-        "version": "1.1",
-        "source": "weather.forecast_and_current_weather.last_24_hour_weather",
-        "dimensions": [
-          {
-            "name": "country",
-            "expr": "source.country",
-            "displayName": "Country"
-          },
-          {
-            "name": "province",
-            "expr": "source.province",
-            "displayName": "Province"
-          },
-          {
-            "name": "place_name",
-            "expr": "source.place_name",
-            "displayName": "Place Name"
-          },
-          {
-            "name": "city",
-            "expr": "source.city",
-            "displayName": "City"
-          },
-          {
-            "name": "latitude",
-            "expr": "source.latitude",
-            "displayName": "Latitude"
-          },
-          {
-            "name": "longitude",
-            "expr": "source.longitude",
-            "displayName": "Longitude"
-          },
-          {
-            "name": "elevation",
-            "expr": "source.elevation",
-            "displayName": "Elevation"
-          },
-          {
-            "name": "query_timestamp",
-            "expr": "source.query_timestamp",
-            "displayName": "Query Timestamp"
-          },
-          {
-            "name": "timestamp",
-            "expr": "source.timestamp",
-            "displayName": "Timestamp"
-          },
-          {
-            "name": "date",
-            "expr": "source.date",
-            "displayName": "Date"
-          },
-          {
-            "name": "time",
-            "expr": "source.time",
-            "displayName": "Time"
-          },
-          {
-            "name": "timezone",
-            "expr": "source.timezone",
-            "displayName": "Timezone"
-          },
-          {
-            "name": "weather_code",
-            "expr": "source.weather_code",
-            "displayName": "Weather Code"
-          },
-          {
-            "name": "weather_category",
-            "expr": "source.weather_category",
-            "displayName": "Weather Category"
-          },
-          {
-            "name": "weather_intensity",
-            "expr": "source.weather_intensity",
-            "displayName": "Weather Intensity"
-          },
-          {
-            "name": "precipitation",
-            "expr": "source.precipitation",
-            "displayName": "Precipitation"
-          },
-          {
-            "name": "rain",
-            "expr": "source.rain",
-            "displayName": "Rain"
-          },
-          {
-            "name": "temperature_2m",
-            "expr": "source.temperature_2m",
-            "displayName": "Temperature 2 M"
-          },
-          {
-            "name": "relative_humidity_2m",
-            "expr": "source.relative_humidity_2m",
-            "displayName": "Relative Humidity 2 M"
-          },
-          {
-            "name": "wind_direction_description",
-            "expr": "source.wind_direction_description",
-            "displayName": "Wind Direction Description"
-          },
-          {
-            "name": "wind_direction_10m",
-            "expr": "source.wind_direction_10m",
-            "displayName": "Wind Direction 10 M"
-          },
-          {
-            "name": "wind_gusts_10m",
-            "expr": "source.wind_gusts_10m",
-            "displayName": "Wind Gusts 10 M"
-          },
-          {
-            "name": "wind_speed_10m",
-            "expr": "source.wind_speed_10m",
-            "displayName": "Wind Speed 10 M"
-          }
-        ],
-        "measures": [
-          {
-            "name": "count",
-            "expr": "COUNT(*)",
-            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
-            "displayName": "Count"
-          }
-        ]
-      }
-    },
-    {
       "name": "a8096cb3",
       "displayName": "last_weather",
       "config": {
@@ -295,7 +162,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "077fc02d",
+                  "datasetName": "a8096cb3",
                   "fields": [
                     {
                       "name": "temperature_2m",
@@ -581,7 +448,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "077fc02d",
+                  "datasetName": "a8096cb3",
                   "fields": [
                     {
                       "name": "avg(relative_humidity_2m)",
@@ -632,7 +499,7 @@
               {
                 "name": "main_query",
                 "query": {
-                  "datasetName": "077fc02d",
+                  "datasetName": "a8096cb3",
                   "fields": [
                     {
                       "name": "avg(temperature_2m)",

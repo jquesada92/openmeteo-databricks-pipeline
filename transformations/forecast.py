@@ -104,8 +104,8 @@ def next_24_and_past_12_weather():
     
     return (
         silver_current
-        .filter(F.col("timestamp") >= F.expr("current_timestamp() - interval 12 hours") &
-                 F.col("timestamp") <= F.expr("current_timestamp() + interval 24 hours" )
+        .filter((F.col("timestamp") >= F.expr("current_timestamp() - interval 12 hours") )&
+                 (F.col("timestamp") <= F.expr("current_timestamp() + interval 24 hours" ))
         )
         .alias("l")
         .join(
