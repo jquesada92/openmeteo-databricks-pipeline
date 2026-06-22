@@ -5,8 +5,10 @@ from transformations_common import (
     create_bronze_weather_stream,
     parse_timestamp_column,
     transform_weather_columns,
-    enrich_with_weather_codes
+    enrich_with_weather_codes,
+    enrich_with_locations
 )
+
 
 # Configuration
 username = spark.conf.get("username")
@@ -56,12 +58,18 @@ dp.create_auto_cdc_flow(
 @dp.table
 def silver_hourly_forecast_weather():
     """Silver layer: Parse timestamp, rename columns, and enrich with weather codes"""
-    return enrich_with_weather_codes(spark,
+    return enrich_with_locations(spark,
+    enrich_with_weather_codes(spark,
         dp.read("bronze_hourly_forecast_weather_scd_type2")
         .transform(parse_timestamp_column)\
             .transform(transform_weather_columns)
-            ).select(
+            )
+    ).select(
                 [
+                'country',
+                'province',
+                'city',
+                'place_name',
                 'latitude',
                 'longitude',
                 'elevation',
@@ -98,7 +106,6 @@ def silver_hourly_forecast_weather():
                 'description_wind_direction_180m',
                 'metadata_ingestion_timestamp']
             )
-
 
 
 

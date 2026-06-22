@@ -6,6 +6,7 @@ from transformations_common import (
     parse_timestamp_column,
     transform_weather_columns,
     enrich_with_weather_codes,
+    enrich_with_locations
 )
 
 # Configuration
@@ -34,7 +35,7 @@ def silver_current_weather():
     transformed = transform_weather_columns(src_table)
 
     # Enrich with weather codes
-    return enrich_with_weather_codes(spark, transformed)
+    return  enrich_with_locations(spark,enrich_with_weather_codes(spark, transformed))
 
 
 @dp.table
@@ -79,18 +80,4 @@ def gold_current_and_forecast_weather():
 
     return (
         forecast_df.unionByName(actual_df, allowMissingColumns=True)
-        .alias("l")
-        .join(
-            sites.alias("r"),
-            (F.col("l.latitude") == F.col("r.latitude"))
-            & (F.col("l.longitude") == F.col("r.longitude")),
-            "left",
-        )
-        .select(
-            F.col("r.country"),
-            F.col("r.province"),
-            F.col("r.place_name"),
-            F.col("r.city"),
-            F.col("l.*"),
-        )
     )

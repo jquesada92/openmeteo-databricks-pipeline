@@ -776,6 +776,18 @@
               "frame": {
                 "showTitle": true
               },
+              "selection": {
+                "defaultSelection": {
+                  "values": {
+                    "dataType": "STRING",
+                    "values": [
+                      {
+                        "value": "Provincia de Panamá"
+                      }
+                    ]
+                  }
+                }
+              },
               "widgetType": "filter-single-select",
               "encodings": {
                 "fields": [
@@ -814,6 +826,14 @@
                     {
                       "name": "longitude",
                       "expression": "`longitude`"
+                    },
+                    {
+                      "name": "city",
+                      "expression": "`city`"
+                    },
+                    {
+                      "name": "place_name",
+                      "expression": "`place_name`"
                     },
                     {
                       "name": "weather_category",
@@ -875,7 +895,15 @@
                   "scale": {
                     "type": "categorical"
                   }
-                }
+                },
+                "extra": [
+                  {
+                    "fieldName": "city"
+                  },
+                  {
+                    "fieldName": "place_name"
+                  }
+                ]
               },
               "data": {
                 "queryName": "main_query"

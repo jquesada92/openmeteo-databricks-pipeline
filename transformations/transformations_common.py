@@ -99,6 +99,24 @@ def transform_weather_columns(df):
         }
     )
 
+def enrich_with_locations(spark,df):
+    sites = spark.read.table("locations")
+    return ( df.alias("l")
+        .join(
+            sites.alias("r"),
+            (F.col("l.latitude") == F.col("r.latitude"))
+            & (F.col("l.longitude") == F.col("r.longitude")),
+            "left",
+        )
+        .select(
+            F.col("r.country"),
+            F.col("r.province"),
+            F.col("r.place_name"),
+            F.col("r.city"),
+            F.col("l.*"),
+        )
+    )
+
 
 def enrich_with_weather_codes(spark, df):
     """

@@ -2,25 +2,29 @@ latitude,longitude,display_name,country,city,province,place_name
 7.6977152824401855,-81.26806640625,"El Tigre de Los Amarillos, Hicaco, Soná, Veraguas, Panamá",Panamá,Hicaco,Veraguas,El Tigre de Los Amarillos
 7.557117938995361,-81.20645141601562,"Puerto Viejo, Gobernadora, Montijo, Veraguas, Panamá",Panamá,Gobernadora,Veraguas,Puerto Viejo
 8.822495460510254,-80.91458129882812,"Urracá, Calovébora, Santa Fe, Veraguas, Panamá",Panamá,Calovébora,Veraguas,Urracá
-7.6977152824401855,-80.425537109375,"Los Bastoncillos, Espino Amarillo, Macaracas, Los Santos, Panamá",Panamá,Espino Amarillo,Los Santos,
-7.486819267272949,-81.74871826171875,"Montijo, Veraguas, Panamá",Panamá,null,Veraguas,Montijo
+7.6977152824401855,-80.425537109375,"Los Bastoncillos, Espino Amarillo, Macaracas, Los Santos, Panamá",Panamá,Espino Amarillo,Los Santos,Los Bastoncillos
+7.486819267272949,-81.74871826171875,"Montijo, Veraguas, Panamá",Panamá,Montijo,Veraguas,Montijo
 8.752197265625,-82.39657592773438,"Vía Alto Jaramillo, Alto Jaramillo, Jaramillo, Boquete, Chiriquí, 0413, Panamá",Panamá,Jaramillo,Chiriquí,Vía Alto Jaramillo
 7.838313102722168,-81.56011962890625,"Bahía Honda, Soná, Veraguas, Panamá",Panamá,Bahía Honda,Veraguas,Bahía Honda
-9.033391952514648,-79.4896240234375,"Cristo Rey, José Domingo Espinar, San Miguelito, Panamá, Provincia de Panamá, 0801, Panamá",Panamá,Panamá,Provincia de Panamá,
-8.049209594726562,-81.30767822265625,"Bajo del Cobre, Rodeo Viejo, Soná, Veraguas, Panamá",Panamá,Rodeo Viejo,Veraguas,
+9.033391952514648,-79.4896240234375,"Cristo Rey, José Domingo Espinar, San Miguelito, Panamá, Provincia de Panamá, 0801, Panamá",Panamá,Panamá,Provincia de Panamá,Cristo Rey
+8.049209594726562,-81.30767822265625,"Bajo del Cobre, Rodeo Viejo, Soná, Veraguas, Panamá",Panamá,Rodeo Viejo,Veraguas,Bajo del Cobre
 8.68189811706543,-80,"El Manglarito, Chame, Panamá Oeste, Panamá",Panamá,El Manglarito,Panamá Oeste,El Manglarito
-8.471001625061035,-80.02578735351562,"El Higo, San Carlos, Panamá Oeste, Panamá",Panamá,San Carlos,Panamá Oeste,
+8.471001625061035,-80.02578735351562,"El Higo, San Carlos, Panamá Oeste, Panamá",Panamá,San Carlos,Panamá Oeste,El Higo
 8.61159896850586,-79.69879150390625,"Punta Chame, Chame, Panamá Oeste, Panamá",Panamá,Punta Chame,Panamá Oeste,Punta Chame
 8.61159896850586,-80.16351318359375,"La Pintada, El Valle, Antón, Coclé, 0212, Panamá",Panamá,El Valle,Coclé,La Pintada
-8.61159896850586,-79.93115234375,"Chame, Panamá Oeste, Panamá",Panamá,null,Panamá Oeste,
-7.978910446166992,-81.08453369140625,"Monjarras, Montijo, Veraguas, Panamá",Panamá,Montijo,Veraguas,
+8.61159896850586,-79.93115234375,"Chame, Panamá Oeste, Panamá",Panamá,Chame,Panamá Oeste,Chame
+7.978910446166992,-81.08453369140625,"Monjarras, Montijo, Veraguas, Panamá",Panamá,Montijo,Veraguas,Monjarras
 8.963092803955078,-79.57647705078125,"Calle Walker, Diablo Heights, Ancón, Distrito de Panamá, Provincia de Panamá, 0843, Panamá",Panamá,Ancón,Provincia de Panamá,Calle Walker
 9.033391952514648,-79.56747436523438,"Valle de San Francisco, Ancón, Distrito de Panamá, Provincia de Panamá, Panamá",Panamá,Ancón,Provincia de Panamá,Valle de San Francisco
-9.384885787963867,-82.2589111328125,"Barriada techos de esperanza - La solución, La Carretera, Boca del Drago, Bocas del Toro, 0101, Panamá",Panamá,Bocas del Toro,Bocas del Toro,
+9.384885787963867,-82.2589111328125,"Barriada techos de esperanza - La solución, La Carretera, Boca del Drago, Bocas del Toro, 0101, Panamá",Panamá,Bocas del Toro,Bocas del Toro,Barriada techos de esperanza - La solución
 7.275922775268555,-80.47418212890625,"Cambutal, Tonosí, Los Santos, Panamá",Panamá,Cambutal,Los Santos,Cambutal
-8.541300773620605,-79.93978881835938,"San José, San Carlos, Panamá Oeste, Panamá",Panamá,San Carlos,Panamá Oeste,
-8.68189811706543,-79.844970703125,"Sajalices, Chame, Panamá Oeste, Panamá",Panamá,Sajalices,Panamá Oeste,
-8.61159896850586,-79.85369873046875,"Pajonal, Chame, Panamá Oeste, Panamá",Panamá,Chame,Panamá Oeste,
-8.61159896850586,-80.00860595703125,"Chame, Panamá Oeste, Panamá",Panamá,null,Panamá Oeste,
+8.541300773620605,-79.93978881835938,"San José, San Carlos, Panamá Oeste, Panamá",Panamá,San Carlos,Panamá Oeste,San José
+8.68189811706543,-79.844970703125,"Sajalices, Chame, Panamá Oeste, Panamá",Panamá,Sajalices,Panamá Oeste,Sajalices
+8.61159896850586,-79.85369873046875,"Pajonal, Chame, Panamá Oeste, Panamá",Panamá,Chame,Panamá Oeste,Pajonal
+8.61159896850586,-80.00860595703125,"Chame, Panamá Oeste, Panamá",Panamá,Chame,Panamá Oeste,Chame
 8.822495460510254,-82.54531860351562,"El Desierto, Cerro Punta, Tierras Altas, Chiriquí, Panamá",Panamá,Cerro Punta,Chiriquí,El Desierto
 7.486819267272949,-80.44989013671875,"Tonosí, Los Santos, Panamá",Panamá,Tonosí,Los Santos,Tonosí
+8.963092803955078,-79.57647705078125,"Albrook Air Force Base, Albrook, Ancón, Distrito de Panamá, Provincia de Panamá, Panamá",Panamá,Ancón,Provincia de Panamá,Albrook Air Force Base
+9.033391952514648,-79.41177368164062,"Aeropuerto Internacional de Tocumen, Tocumen, Distrito de Panamá, Provincia de Panamá, Panamá",Panamá,Tocumen,Provincia de Panamá,Aeropuerto Internacional de Tocumen
+9.033391952514648,-79.4896240234375,"Obarrio, Bella Vista, Distrito de Panamá, Provincia de Panamá, Panamá",Panamá,Bella Vista,Provincia de Panamá,Obarrio
+8.963092803955078,-79.57647705078125,"Balboa, Ancón, Distrito de Panamá, Provincia de Panamá, Panamá",Panamá,Ancón,Provincia de Panamá,Balboa

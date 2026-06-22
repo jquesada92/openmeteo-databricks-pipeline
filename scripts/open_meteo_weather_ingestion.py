@@ -2,7 +2,8 @@ from openmeteo_requests import Client
 from requests_cache import CachedSession
 from retry_requests import retry
 import hashlib
-
+import uuid
+import time
 import json
 from typing import Dict, Any, Optional, Callable
 from utils import make_json_serializable, now_dt
@@ -47,29 +48,44 @@ class OpenMeteoWeatherIngestion:
     def __write_data_to_folder(self, data: Dict[str, Any], sub_folder: str = 'current') -> None:
         """
         Write weather data to a JSON file in the user's workspace folder.
-        
+
         Args:
             data: Dictionary containing weather data to be saved
             sub_folder: Subfolder name within the weather data directory (default: 'current')
-        
+
         Note:
             Files are named using epoch timestamp and SHA256 hash to ensure uniqueness.
         """
         # Get current Databricks username
 
         # Add query timestamp to data
-        
+
         # Construct folder path in user's workspace
         folder: str = f'/Workspace/Users/{self.username}/openmeteo-databricks-pipeline/data/forecast/{sub_folder}/'
+        json_payload: str = json.dumps(
+        data,
+        ensure_ascii=False,
+        default=str
+        )
 
-        # Generate unique filename using epoch timestamp and hash
-        hasher = hashlib.sha256()
-        epoch_seconds: int = int(now_dt().timestamp())
-        file_name: str = f'{epoch_seconds}_{hasher.hexdigest()}.json'
+        content_hash: str = hashlib.sha256(
+        json_payload.encode("utf-8")
+        ).hexdigest()[:16]
+
+        epoch_ns: int = time.time_ns()
+        unique_id: str = uuid.uuid4().hex[:12]
+
+        file_name: str = f'{epoch_ns}_{sub_folder}_{content_hash}_{unique_id}.json'
+        file_path: str = folder + file_name
 
         print(file_name)
+
+        # overwrite=False evita sobrescritura accidental
+        self.dbutils.fs.put(file_path, json_payload, False)
+
+
         
-        self.dbutils.fs.put(folder + file_name, json.dumps(data), True)
+
 
     def __current_config(self) -> None:
         """
