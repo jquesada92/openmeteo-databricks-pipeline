@@ -92,7 +92,7 @@ def transform_weather_columns(df):
             **{x: F.col(x).cast("double") for x in selected_columns},
             **{
                 f"description_{x}": F.expr(
-                    f"weather.forecast_and_current_weather.get_wind_direction({x})"
+                    f"weather.open_meteo.get_wind_direction({x})"
                 )
                 for x in wind_direction_cols
             },

@@ -105,7 +105,9 @@ class OpenMeteoWeatherIngestion:
             "hourly": [
                 "temperature_2m", 
                 "relative_humidity_2m", 
+                "precipitation_probability",
                 "precipitation",
+                "rain",
                 "showers",
                 "weather_code", 
                 "pressure_msl", 
@@ -120,8 +122,8 @@ class OpenMeteoWeatherIngestion:
                 "wind_gusts_10m", 
                 "temperature_80m", 
                 "temperature_120m", 
-                "temperature_180m", 
-                "rain"
+                "temperature_180m"
+              
             ],
             "forecast_days": 16,
         })

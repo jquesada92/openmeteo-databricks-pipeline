@@ -38,6 +38,7 @@ dp.create_auto_cdc_flow(
     sequence_by="query_timestamp",  # Column for ordering events (timestamp)
     stored_as_scd_type=2,  # Enable SCD Type 2 - adds __START_AT and __END_AT columns
     track_history_column_list = ['weather_code',
+                                   "precipitation_probability",
                                 'precipitation',
                                 'rain',
                                 'showers',
@@ -69,16 +70,19 @@ def silver_hourly_forecast_weather():
                 'query_timestamp',
                 'timestamp',
                 'timezone',
-                'precipitation',
                 'pressure_msl',
+                'precipitation',
+                "precipitation_probability",
                 'rain',
-                'relative_humidity_2m',
                 'showers',
+                'relative_humidity_2m',
                 'temperature_120m',
                 'temperature_180m',
                 'temperature_2m',
                 'temperature_80m',
                 'weather_code',
+                'weather_category',
+                'weather_intensity',
                 'wind_speed_10m',
                 'wind_gusts_10m',
                 'wind_direction_10m',
@@ -95,34 +99,6 @@ def silver_hourly_forecast_weather():
                 'metadata_ingestion_timestamp']
             )
 
-
-@dp.table
-def next_24_and_past_12_weather():
-    silver_current = dp.read("silver_hourly_forecast_weather")
-    sites = spark.read.table("locations")
-
-    
-    return (
-        silver_current
-        .filter((F.col("timestamp") >= F.expr("current_timestamp() - interval 12 hours") )&
-                 (F.col("timestamp") <= F.expr("current_timestamp() + interval 24 hours" ))
-        )
-        .alias("l")
-        .join(
-            sites.alias("r"),
-            (F.col("l.latitude") == F.col("r.latitude")) & 
-            (F.col("l.longitude") == F.col("r.longitude")),
-            "left"
-        )
-       
-        .select(
-            F.col("r.country"),
-            F.col("r.province"),
-            F.col("r.place_name"),
-            F.col("r.city"),
-            F.col("l.*")
-        )
-    )
 
 
 
