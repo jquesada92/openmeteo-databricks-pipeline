@@ -293,7 +293,7 @@
           "position": {
             "x": 0,
             "y": 2,
-            "width": 3,
+            "width": 2,
             "height": 3
           }
         },
@@ -347,9 +347,9 @@
             }
           },
           "position": {
-            "x": 3,
+            "x": 2,
             "y": 2,
-            "width": 3,
+            "width": 2,
             "height": 3
           }
         },
@@ -405,7 +405,7 @@
           "position": {
             "x": 6,
             "y": 2,
-            "width": 3,
+            "width": 2,
             "height": 3
           }
         },
@@ -459,9 +459,9 @@
             }
           },
           "position": {
-            "x": 9,
+            "x": 8,
             "y": 2,
-            "width": 3,
+            "width": 2,
             "height": 3
           }
         },
@@ -620,7 +620,10 @@
                 "y": {
                   "fieldName": "city",
                   "scale": {
-                    "type": "categorical"
+                    "type": "categorical",
+                    "sort": {
+                      "by": "x-reversed"
+                    }
                   }
                 }
               },
@@ -1011,6 +1014,95 @@
             "y": 10,
             "width": 6,
             "height": 4
+          }
+        },
+        {
+          "widget": {
+            "name": "probabilidad-de-lluvia",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d8657637",
+                  "fields": [
+                    {
+                      "name": "avg(precipitation_probability)",
+                      "expression": "AVG(`precipitation_probability`)"
+                    }
+                  ],
+                  "filters": [
+                    {
+                      "expression": "`event_distance_hour` IN (0)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Probabilidad de Lluvia"
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(precipitation_probability)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 4,
+            "y": 2,
+            "width": 2,
+            "height": 3
+          }
+        },
+        {
+          "widget": {
+            "name": "25861a9a",
+            "queries": [
+              {
+                "name": "main_query",
+                "query": {
+                  "datasetName": "d8657637",
+                  "fields": [
+                    {
+                      "name": "avg(wind_direction_10m)",
+                      "expression": "AVG(`wind_direction_10m`)"
+                    }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "frame": {
+                "showTitle": true,
+                "title": "Direccion del Viento "
+              },
+              "widgetType": "counter",
+              "encodings": {
+                "value": {
+                  "fieldName": "avg(wind_direction_10m)"
+                }
+              },
+              "data": {
+                "queryName": "main_query"
+              }
+            }
+          },
+          "position": {
+            "x": 10,
+            "y": 2,
+            "width": 2,
+            "height": 3
           }
         }
       ],
