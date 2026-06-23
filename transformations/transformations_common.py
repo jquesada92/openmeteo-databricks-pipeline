@@ -50,7 +50,7 @@ def parse_timestamp_column(
         {
             "timestamp": timestamp_col.cast("timestamp"),
             "date": F.to_date(timestamp_col),
-            "hour": F.date_format(timestamp_col, "HH:mm:ss"),
+            "hour": F.date_format(timestamp_col, "HH").cast('int'),
             "query_timestamp": F.to_timestamp(
                 F.col("query_timestamp"), "yyyy-MM-dd HH:mm:ss.SSSSSSXXX"
             ),
