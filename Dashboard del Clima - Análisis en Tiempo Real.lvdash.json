@@ -4,8 +4,17 @@
       "name": "d8657637",
       "displayName": "gold_current_and_forecast_weather",
       "config": {
-        "version": "1.1",
         "source": "weather.open_meteo.gold_current_and_forecast_weather",
+        "measures": [
+          {
+            "name": "count",
+            "expr": "COUNT(*)",
+            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
+            "displayName": "Count"
+          }
+        ],
+        "filter": "source.hour <= 18 AND source.hour >= 6",
+        "version": "1.1",
         "dimensions": [
           {
             "name": "country",
@@ -216,14 +225,6 @@
             "name": "precipitation_probability",
             "expr": "source.precipitation_probability",
             "displayName": "Precipitation Probability"
-          }
-        ],
-        "measures": [
-          {
-            "name": "count",
-            "expr": "COUNT(*)",
-            "comment": "Represents the total number of rows in the dataset. Use this measure to count all",
-            "displayName": "Count"
           }
         ]
       }
@@ -497,10 +498,6 @@
                     {
                       "name": "place_name",
                       "expression": "`place_name`"
-                    },
-                    {
-                      "name": "weather_category",
-                      "expression": "`weather_category`"
                     }
                   ],
                   "filters": [
@@ -549,12 +546,6 @@
                     "type": "quantitative"
                   }
                 },
-                "shape": {
-                  "fieldName": "weather_category",
-                  "scale": {
-                    "type": "categorical"
-                  }
-                },
                 "extra": [
                   {
                     "fieldName": "province"
@@ -576,7 +567,7 @@
             "x": 5,
             "y": 5,
             "width": 7,
-            "height": 4
+            "height": 5
           }
         },
         {
@@ -636,7 +627,7 @@
             "x": 0,
             "y": 5,
             "width": 5,
-            "height": 4
+            "height": 5
           }
         },
         {
@@ -690,7 +681,7 @@
         },
         {
           "widget": {
-            "name": "dcdd0fd5",
+            "name": "nivel",
             "queries": [
               {
                 "name": "main_query",
@@ -716,6 +707,10 @@
             ],
             "spec": {
               "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Nivel de LLuvia por Hora Forecast Vs Real"
+              },
               "widgetType": "line",
               "encodings": {
                 "x": {
@@ -744,9 +739,9 @@
           },
           "position": {
             "x": 0,
-            "y": 10,
+            "y": 11,
             "width": 6,
-            "height": 4
+            "height": 5
           }
         },
         {
@@ -775,18 +770,6 @@
               "version": 2,
               "frame": {
                 "showTitle": true
-              },
-              "selection": {
-                "defaultSelection": {
-                  "values": {
-                    "dataType": "STRING",
-                    "values": [
-                      {
-                        "value": "Provincia de Panamá"
-                      }
-                    ]
-                  }
-                }
               },
               "widgetType": "filter-single-select",
               "encodings": {
@@ -836,17 +819,13 @@
                       "expression": "`place_name`"
                     },
                     {
-                      "name": "weather_category",
-                      "expression": "`weather_category`"
-                    },
-                    {
                       "name": "avg(precipitation)",
                       "expression": "AVG(`precipitation`)"
                     }
                   ],
                   "filters": [
                     {
-                      "expression": "`event_distance_hour` IN ('1')"
+                      "expression": "`event_distance_hour` IN (1)"
                     }
                   ],
                   "disaggregated": false
@@ -855,13 +834,14 @@
             ],
             "spec": {
               "version": 2,
-              "mark": {
-                "opacity": 0.69,
-                "size": -2.2
-              },
               "frame": {
                 "title": "Pronostico de Lluvia",
                 "showTitle": true
+              },
+              "mark": {
+                "opacity": 0.69,
+                "size": -2.2,
+                "shape": "circle"
               },
               "widgetType": "symbol-map",
               "encodings": {
@@ -875,12 +855,16 @@
                 },
                 "color": {
                   "fieldName": "avg(precipitation_probability)",
-                  "displayName": "Porbabilidad de lluvia",
+                  "displayName": "Probabilidad de lluvia",
                   "scale": {
                     "type": "quantitative",
                     "colorRamp": {
                       "mode": "scheme",
                       "scheme": "blues"
+                    },
+                    "domain": {
+                      "min": 0,
+                      "max": 100
                     }
                   }
                 },
@@ -888,12 +872,6 @@
                   "fieldName": "avg(precipitation)",
                   "scale": {
                     "type": "quantitative"
-                  }
-                },
-                "shape": {
-                  "fieldName": "weather_category",
-                  "scale": {
-                    "type": "categorical"
                   }
                 },
                 "extra": [
@@ -912,7 +890,7 @@
           },
           "position": {
             "x": 0,
-            "y": 14,
+            "y": 16,
             "width": 12,
             "height": 8
           }
@@ -928,7 +906,7 @@
           },
           "position": {
             "x": 0,
-            "y": 9,
+            "y": 10,
             "width": 12,
             "height": 1
           }
@@ -980,7 +958,7 @@
         },
         {
           "widget": {
-            "name": "25a8ca09",
+            "name": "probabilida1",
             "queries": [
               {
                 "name": "main_query",
@@ -1011,6 +989,10 @@
             ],
             "spec": {
               "version": 3,
+              "frame": {
+                "showTitle": true,
+                "title": "Probabilidad de Lluvia por Hora"
+              },
               "widgetType": "line",
               "encodings": {
                 "x": {
@@ -1021,6 +1003,9 @@
                 },
                 "y": {
                   "fieldName": "avg(precipitation_probability)",
+                  "axis": {
+                    "title": "Probabilidad de Lluvia"
+                  },
                   "scale": {
                     "type": "quantitative"
                   }
@@ -1030,6 +1015,9 @@
                   "scale": {
                     "type": "categorical"
                   }
+                },
+                "label": {
+                  "show": false
                 }
               },
               "data": {
@@ -1039,9 +1027,9 @@
           },
           "position": {
             "x": 6,
-            "y": 10,
+            "y": 11,
             "width": 6,
-            "height": 4
+            "height": 5
           }
         },
         {
