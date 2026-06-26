@@ -13,7 +13,7 @@
             "displayName": "Count"
           }
         ],
-        "filter": "source.hour <= 18 AND source.hour >= 7",
+        "filter": "(source.hour >= 8 AND source.hour <= 18) OR (source.last_measure = true)\r\nOR (ABS(source.forecast_horizon_hours) <= 1)",
         "version": "1.1",
         "dimensions": [
           {
