@@ -39,8 +39,9 @@ dp.create_auto_cdc_flow(
     keys=["latitude",'longitude','timestamp'],  # Primary keys for row identification
     sequence_by="query_timestamp",  # Column for ordering events (timestamp)
     stored_as_scd_type=2,  # Enable SCD Type 2 - adds __START_AT and __END_AT columns
-    track_history_column_list = ['weather_code',
-                                   "precipitation_probability",
+    track_history_column_list = [
+                                'weather_code',
+                                "precipitation_probability",
                                 'precipitation',
                                 'rain',
                                 'showers',
@@ -61,6 +62,7 @@ def silver_hourly_forecast_weather():
     return enrich_with_locations(spark,
     enrich_with_weather_codes(spark,
         dp.read("bronze_hourly_forecast_weather_scd_type2")
+        .where('__END_AT IS NULL')
         .transform(parse_timestamp_column)\
             .transform(transform_weather_columns)
             )

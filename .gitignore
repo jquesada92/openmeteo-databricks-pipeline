@@ -1,2 +1,5 @@
 .cache.sqlite
-/data/forecast
+/data/forecast/current
+/data/forecast/hourly
+/taller/checkpoint
+/taller/data

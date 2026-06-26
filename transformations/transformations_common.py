@@ -16,8 +16,11 @@ def create_bronze_weather_stream(spark, source_folder):
         spark.readStream.format("cloudFiles")
         .option("cloudFiles.format", "json")
         .option("cloudFiles.schemaEvolutionMode", "addNewColumns")
-        .load(source_folder)
-        .withColumn("metadata_ingestion_timestamp", F.current_timestamp())
+        .option('cloudFiles.cleanSource','DELETE')
+        .option('cloudFiles.cleanSource.retentionDuration',"7 days")
+        .load(source_folder)\
+        .withColumns({"metadata_ingestion_timestamp":  F.from_utc_timestamp(F.current_timestamp(), "America/Panama"),
+                      'metadata_file_name': F.col('_metadata.file_path')})
     )
 
 

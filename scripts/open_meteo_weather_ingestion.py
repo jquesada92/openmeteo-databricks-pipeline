@@ -80,6 +80,9 @@ class OpenMeteoWeatherIngestion:
 
         print(file_name)
 
+        # Ensure the directory exists before writing
+        self.dbutils.fs.mkdirs(folder)
+        
         # overwrite=False evita sobrescritura accidental
         self.dbutils.fs.put(file_path, json_payload, False)
 
