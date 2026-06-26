@@ -55,7 +55,7 @@ def add_scd2_metadata(
     __window_end_at = Window.partitionBy(keys).orderBy(
         F.col(sequence_by).desc()
     )
-    return source_df.withColumns(
+    return source_df.dropDuplicates(subset= keys + tracking_cols).withColumns(
         {
             start_col: F.col(sequence_by),
             end_col: F.lag(sequence_by).over(__window_end_at),
@@ -114,6 +114,7 @@ class SCD2:
         else:
             target_table = DeltaTable.forName(spark,self.sink_table_name)
             target_df = target_table.toDF().alias("target")
+            source_df = source_df
 
 
             merge_condition = " AND ".join(
@@ -123,7 +124,7 @@ class SCD2:
             tracking_condition = ' ('  + build_tracking_change_condition_sql(self.tracking_cols) + ')'
             condition = f"(target.{self.end_col} IS NULL AND target.{self.sequence_by} < update.{self.sequence_by} ) AND " + tracking_condition
             target_table.alias('target').merge(
-                source_df, merge_condition
+                source_df.where(f'{self.end_col} IS NULL'), merge_condition
             ).whenMatchedUpdate(
                 condition=condition,
                 set={f"target.{self.end_col}": f"update.{self.start_col}",
@@ -131,15 +132,19 @@ class SCD2:
             ).execute()
 
             #Registros nuevos
-            source_df.withColumn('mode',F.lit('append_new')).join(target_df.select(self.keys), on=self.keys, how="left_anti").write.mode(
+            source_df.withColumn('mode',F.lit('append_new')).join(target_df.select(self.keys).distinct(), on=self.keys, how="left_anti").write.mode(
                 "append"
             ).format("delta").saveAsTable(self.sink_table_name)
 
+            last_update_target_df =  target_df.withColumn('last_update',F.row_number().over(Window.partitionBy(self.keys).orderBy(F.col(self.end_col).desc())))\
+                                        .where(f"last_update = 1")\
+                                        .drop('last_update').alias('target')
             #Actualizacoines
-            source_df.join(target_df, on=self.keys, how="inner")\
+            source_df.where(f'{self.end_col} IS NULL').join( last_update_target_df, on=self.keys, how="inner")\
                 .where(tracking_condition)\
                 .where(f"update.{self.sequence_by} > target.{self.sequence_by}")\
                     .select('update.*')\
+                        .dropDuplicates()\
                         .withColumn('mode',F.lit('append_update'))\
                 .write.mode(
                 "append"

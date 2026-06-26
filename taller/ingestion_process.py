@@ -3,13 +3,6 @@
 # [tool.databricks.environment]
 # environment_version = "5"
 # ///
-# MAGIC %load_ext autoreload
-# MAGIC %autoreload 2
-# MAGIC # Enables autoreload; learn more at https://docs.databricks.com/en/files/workspace-modules.html#autoreload-for-python-modules
-# MAGIC # To disable autoreload; run %autoreload 0
-
-# COMMAND ----------
-
 # MAGIC %md 
 # MAGIC
 # MAGIC # Configuraciones
@@ -155,7 +148,7 @@ from datetime import datetime, timedelta
 import hashlib
 import uuid
 import json
-
+import time
 from zoneinfo import ZoneInfo
 
 def generate_synthetic_weather_data_json(folder,num_records=100):
@@ -201,7 +194,7 @@ def generate_synthetic_weather_data_json(folder,num_records=100):
 
 
 output_path = "/Workspace/Users/jaquesada92@outlook.com/openmeteo-databricks-pipeline/taller/data/hourly/"
-generate_synthetic_weather_data_json(output_path,3)
+generate_synthetic_weather_data_json(output_path,100)
 
 # COMMAND ----------
 
@@ -214,10 +207,7 @@ _sdf.count()
 
 # COMMAND ----------
 
-_sdf.groupBy('latitude','longitude','timestamp').agg(F.countDistinct('precipitation_probability'),F.countDistinct('precipitation'),F.countDistinct('weather_code'),F.countDistinct('wind_direction_10m'),F.countDistinct('wind_gusts_10m'),F.countDistinct('wind_speed_10m'),F.count('*')).display()
-
-# COMMAND ----------
-
+# DBTITLE 1,Cell 15
 from scd2_utils import SCD2
 
 sdf = (spark.readStream.schema(schema)
@@ -235,19 +225,3 @@ scd2_process = SCD2(sdf,'test.weather.scd2',['latitude','longitude','timestamp']
 
 
 scd2_process.stream_update_bronze('/Workspace/Users/jaquesada92@outlook.com/openmeteo-databricks-pipeline/taller/checkpoint/hourly').awaitTermination() 
-
-# COMMAND ----------
-
-_sdf.distinct().display()
-
-# COMMAND ----------
-
-# MAGIC %sql select * from test.weather.scd2 
-
-# COMMAND ----------
-
-_sdf.display()
-
-# COMMAND ----------
-
-
