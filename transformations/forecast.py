@@ -11,9 +11,8 @@ from transformations_common import (
 
 
 # Configuration
-username = spark.conf.get("username")
 schema = "forecast_and_current_weather"
-bronze_folder = f"/Workspace/Users/{username}/openmeteo-databricks-pipeline/data/forecast/hourly"
+bronze_folder = "/Volumes/weather/open_meteo/open_meteo/hourly"
 
 
 

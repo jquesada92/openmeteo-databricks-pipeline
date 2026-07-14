@@ -9,11 +9,8 @@ from transformations_common import (
     enrich_with_locations
 )
 
-# Configuration
-username = spark.conf.get("username")
-bronze_folder = (
-    f"/Workspace/Users/{username}/openmeteo-databricks-pipeline/data/forecast/current"
-)
+bronze_folder = "/Volumes/weather/open_meteo/open_meteo/current"
+
 
 
 @dp.table
@@ -50,7 +47,7 @@ def gold_current_and_forecast_weather():
                 F.col("timestamp")
               
             )
-        ).filter(F.abs(F.col("forecast_horizon_hours")) <= 4)
+        ).filter(F.abs(F.col("forecast_horizon_hours")) <= 12)
 
     forecast_df = (
         dp.read("silver_hourly_forecast_weather")

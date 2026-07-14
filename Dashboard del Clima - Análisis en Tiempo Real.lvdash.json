@@ -246,8 +246,8 @@
           },
           "position": {
             "x": 0,
-            "y": 1,
-            "width": 12,
+            "y": 0,
+            "width": 7,
             "height": 1
           }
         },
@@ -293,7 +293,7 @@
           },
           "position": {
             "x": 0,
-            "y": 2,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -349,7 +349,7 @@
           },
           "position": {
             "x": 2,
-            "y": 2,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -405,7 +405,7 @@
           },
           "position": {
             "x": 6,
-            "y": 2,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -461,7 +461,7 @@
           },
           "position": {
             "x": 8,
-            "y": 2,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -511,13 +511,13 @@
             ],
             "spec": {
               "version": 2,
-              "mark": {
-                "opacity": 0.69,
-                "size": -2.2
-              },
               "frame": {
                 "showTitle": true,
                 "title": "Lluvia ultima medicion"
+              },
+              "mark": {
+                "opacity": 0.69,
+                "size": 0
               },
               "widgetType": "symbol-map",
               "encodings": {
@@ -543,7 +543,11 @@
                 "size": {
                   "fieldName": "avg(precipitation)",
                   "scale": {
-                    "type": "quantitative"
+                    "type": "quantitative",
+                    "domain": {
+                      "min": 0,
+                      "max": 50
+                    }
                   }
                 },
                 "extra": [
@@ -565,7 +569,7 @@
           },
           "position": {
             "x": 5,
-            "y": 5,
+            "y": 4,
             "width": 7,
             "height": 5
           }
@@ -625,7 +629,7 @@
           },
           "position": {
             "x": 0,
-            "y": 5,
+            "y": 4,
             "width": 5,
             "height": 5
           }
@@ -673,9 +677,9 @@
             }
           },
           "position": {
-            "x": 8,
+            "x": 7,
             "y": 0,
-            "width": 4,
+            "width": 5,
             "height": 1
           }
         },
@@ -739,66 +743,9 @@
           },
           "position": {
             "x": 0,
-            "y": 11,
+            "y": 10,
             "width": 6,
             "height": 5
-          }
-        },
-        {
-          "widget": {
-            "name": "87a0499b",
-            "queries": [
-              {
-                "name": "dashboards/01f169bd287d107980e1ddecf126e9b3/datasets/01f16c422f691bc9a8511299639e25ca_province",
-                "query": {
-                  "datasetName": "d8657637",
-                  "fields": [
-                    {
-                      "name": "province",
-                      "expression": "`province`"
-                    },
-                    {
-                      "name": "province_associativity",
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              }
-            ],
-            "spec": {
-              "version": 2,
-              "frame": {
-                "showTitle": true
-              },
-              "selection": {
-                "defaultSelection": {
-                  "values": {
-                    "dataType": "STRING",
-                    "values": [
-                      {
-                        "value": "Provincia de Panamá"
-                      }
-                    ]
-                  }
-                }
-              },
-              "widgetType": "filter-single-select",
-              "encodings": {
-                "fields": [
-                  {
-                    "fieldName": "province",
-                    "queryName": "dashboards/01f169bd287d107980e1ddecf126e9b3/datasets/01f16c422f691bc9a8511299639e25ca_province"
-                  }
-                ]
-              }
-            }
-          },
-          "position": {
-            "x": 0,
-            "y": 0,
-            "width": 4,
-            "height": 1
           }
         },
         {
@@ -852,7 +799,7 @@
               },
               "mark": {
                 "opacity": 0.69,
-                "size": -2.2,
+                "size": -0.1,
                 "shape": "circle"
               },
               "widgetType": "symbol-map",
@@ -883,7 +830,11 @@
                 "size": {
                   "fieldName": "avg(precipitation)",
                   "scale": {
-                    "type": "quantitative"
+                    "type": "quantitative",
+                    "domain": {
+                      "min": 0,
+                      "max": 50
+                    }
                   }
                 },
                 "extra": [
@@ -902,7 +853,7 @@
           },
           "position": {
             "x": 0,
-            "y": 16,
+            "y": 15,
             "width": 12,
             "height": 8
           }
@@ -918,53 +869,8 @@
           },
           "position": {
             "x": 0,
-            "y": 10,
+            "y": 9,
             "width": 12,
-            "height": 1
-          }
-        },
-        {
-          "widget": {
-            "name": "be56ac3e",
-            "queries": [
-              {
-                "name": "dashboards/01f169bd287d107980e1ddecf126e9b3/datasets/01f16c422f691bc9a8511299639e25ca_place_name",
-                "query": {
-                  "datasetName": "d8657637",
-                  "fields": [
-                    {
-                      "name": "place_name",
-                      "expression": "`place_name`"
-                    },
-                    {
-                      "name": "place_name_associativity",
-                      "expression": "COUNT_IF(`associative_filter_predicate_group`)"
-                    }
-                  ],
-                  "disaggregated": false
-                }
-              }
-            ],
-            "spec": {
-              "version": 2,
-              "frame": {
-                "showTitle": true
-              },
-              "widgetType": "filter-single-select",
-              "encodings": {
-                "fields": [
-                  {
-                    "fieldName": "place_name",
-                    "queryName": "dashboards/01f169bd287d107980e1ddecf126e9b3/datasets/01f16c422f691bc9a8511299639e25ca_place_name"
-                  }
-                ]
-              }
-            }
-          },
-          "position": {
-            "x": 4,
-            "y": 0,
-            "width": 4,
             "height": 1
           }
         },
@@ -1039,7 +945,7 @@
           },
           "position": {
             "x": 6,
-            "y": 11,
+            "y": 10,
             "width": 6,
             "height": 5
           }
@@ -1086,7 +992,7 @@
           },
           "position": {
             "x": 4,
-            "y": 2,
+            "y": 1,
             "width": 2,
             "height": 3
           }
@@ -1128,7 +1034,7 @@
           },
           "position": {
             "x": 10,
-            "y": 2,
+            "y": 1,
             "width": 2,
             "height": 3
           }
